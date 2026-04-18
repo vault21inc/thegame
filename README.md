@@ -75,12 +75,12 @@ Developer tools may use search/backtracking to prove uniqueness. Difficulty grad
 
 ## Official Deduction Set
 
-The difficulty grader and logic-solve validator should use these four deduction families plus placement housekeeping.
+These four deduction families plus placement housekeeping are the **player-facing vocabulary** — the techniques the game teaches and the hint system explains. The grader uses one additional family internally (higher-order confinement) to validate Master-band puzzles; see [docs/level-generation.md](docs/level-generation.md) Stage 4 for the full grader set.
 
 | # | Deduction | Meaning |
 |---|---|---|
 | 1 | Giveaway Cell | A row, column, or region has only one remaining candidate, so the token must go there. |
-| 2 | Confinement / Row-Column Forcing | All remaining candidates for a region lie in one row or column, so other cells in that row or column can be eliminated. |
+| 2 | Confinement | If all remaining candidates of one axis lie within another axis, cells outside that intersection can be eliminated. Applies in both directions: if a region's candidates all lie in one row (or column), the rest of that row (or column) can be cleared; and if a row (or column) has all its candidates inside one region, the rest of that region can be cleared. |
 | 3 | Touch-All Elimination | A candidate outside a region touches every remaining candidate inside that region, so the outside candidate can be eliminated. |
 | 4 | Contradiction / Blocking Elimination | Placing a token in a candidate cell would immediately eliminate all candidates in another row, column, or region, so that candidate can be eliminated. |
 
@@ -136,8 +136,10 @@ Double-tap validation checks against the hidden unique solution immediately. It 
 
 There are two visual categories of X marks:
 
-- **Player-placed X marks:** toggled by single tap. The player can add and remove these freely.
-- **Auto-housekeeping X marks:** placed automatically after a correct token placement. These are **visually distinct** from player-placed marks (different style, color, or opacity) and **cannot be removed** by the player.
+- **Player-placed X marks:** toggled by single tap. The player can add and remove these freely. Visually, a player X is rendered as a **treasure-map "X marks the spot"** — a hand-drawn charcoal/ink X, evoking a pirate treasure map. Tactile and "sketched" rather than geometric.
+- **Auto-housekeeping X marks:** placed automatically after a correct token placement. Visually, an auto X is rendered as a **skull and crossbones**, clearly and immediately distinct from the player X. Auto marks **cannot be removed** by the player.
+
+The two mark styles must remain distinguishable for colorblind and low-vision players — the distinction is carried by shape (charcoal X vs. skull-and-crossbones silhouette), not color alone.
 
 ### Undo and Restart
 
@@ -444,9 +446,9 @@ The generator is a **generate-and-test pipeline with structured retry**. Candida
 
 The pipeline guarantees every shipped puzzle has a unique solution, is reachable through pure logic, carries a stable difficulty grade, and is distinct from every other puzzle in the pack. The 500-puzzle pack is ordered to ramp difficulty and introduce deduction families progressively.
 
-**The authoritative specification for the generator — including the deduction set used by the grader, retry budgets, canonicalization scheme, band quotas, and ordering strategy — is [docs/level-generation.md](docs/level-generation.md).**
+**The authoritative specification for the generator — including the full grader deduction set, retry budgets, canonicalization scheme, band quotas, and ordering strategy — is [docs/level-generation.md](docs/level-generation.md).**
 
-One product-level decision is flagged there and should be resolved before implementation: whether the player-facing deduction vocabulary stays at the 4 families in [Official Deduction Set](#official-deduction-set) (with the grader using additional families internally to validate Master-band puzzles) or expands to match the grader.
+The player-facing deduction vocabulary is the 4 families in [Official Deduction Set](#official-deduction-set). The grader uses one additional family internally — higher-order confinement — to validate Master-band puzzles. This extra family is not taught explicitly; Master-tier players are expected to discover it through play.
 
 ---
 
@@ -460,7 +462,7 @@ The puzzle core should have heavy unit test coverage before UI work gets deep.
 - Unique-solution detection.
 - Hidden-solution double-tap validation.
 - Housekeeping mark generation (both player and auto marks).
-- Each official deduction family.
+- Each deduction family — the four player-facing families and the grader-only higher-order confinement extension.
 - Full logic-solve paths for known puzzle fixtures.
 - Difficulty grading for known easy/medium/hard/master examples.
 
@@ -500,23 +502,13 @@ V1 should include:
 
 ---
 
-## Open Decisions
-
-These decisions should be resolved before or during implementation:
-
-- Whether the first 500 levels are fully auto-generated or generated then manually curated.
-- Distribution of difficulty bands across the 500 levels.
-- Exact visual style for auto X marks vs player X marks.
-
----
-
 ## Development Priorities
 
 Recommended first milestones:
 
 1. Build `puzzle_core` with board models, validator, and solution checker.
 2. Add fixtures for small known-valid 8 x 8 puzzles.
-3. Implement the four deduction families for validation and difficulty grading.
+3. Implement the four player-facing deduction families and the grader-only higher-order confinement extension for validation and difficulty grading.
 4. Build a CLI that verifies uniqueness and logic-solvability.
 5. Scaffold the Flutter app.
 6. Render a playable board with tap, X marks, double-tap, lives, and restart.

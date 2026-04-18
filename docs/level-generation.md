@@ -126,28 +126,24 @@ Simulate the deduction set on the puzzle to confirm it can be solved without gue
 
 ### Deduction set
 
-The grader uses a richer vocabulary than the 4 player-facing families listed in the root README. The extra families are still pure logic (no guessing) and are needed to resolve Hard/Master puzzles that would otherwise be rejected as "stuck."
+The grader uses the 4 player-facing families from the root README plus **one** extension used only to validate Master-band puzzles. All are pure logic — no guessing.
 
 **Player-facing core (4 families, per README):**
 
 1. **Giveaway Cell.** A row, column, or region has only one remaining candidate.
-2. **Region → Row/Column Confinement.** All remaining candidates for a region lie in one row or column; eliminate other cells in that row or column.
+2. **Confinement.** If all remaining candidates of one axis lie within another axis, eliminate cells outside that intersection. Applies in both directions:
+   - *Region → Row/Column:* all candidates for a region lie in one row or column; eliminate other cells in that row or column.
+   - *Row/Column → Region:* all candidates for a row or column lie within one region; eliminate other cells of that region.
+
+   The two directions are the same cognitive pattern and are taught as one rule.
 3. **Touch-All Elimination.** A candidate outside a region is adjacent to every remaining candidate inside that region; eliminate the outside candidate.
 4. **Contradiction / Blocking Elimination.** Placing a token at a candidate would eliminate all candidates in some other row, column, or region; eliminate that candidate.
 
-**Grader extensions (2 additional families):**
+**Grader extension (1 additional family), used only to validate Master puzzles:**
 
-5. **Row/Column → Region Confinement.** If all remaining candidates for a row or column lie within one region, eliminate all other candidates in that region. Symmetric to family 2.
-6. **Higher-Order Confinement.** If the candidates for K regions collectively occupy only K rows (or K columns), those regions account for all tokens in those rows/columns; eliminate those rows/columns from every other region. Symmetric: if K rows' candidates lie in K regions, eliminate those regions from all other rows. Practical cases on 8x8 are K = 2 and K = 3.
+5. **Higher-Order Confinement.** If the candidates for K regions collectively occupy only K rows (or K columns), those regions account for all tokens in those rows/columns; eliminate those rows/columns from every other region. Symmetric: if K rows' candidates lie in K regions, eliminate those regions from all other rows. Practical cases on 8x8 are K = 2 and K = 3.
 
-### Design decision required
-
-There are two viable product postures for the extended deductions:
-
-- **Option A — Keep player vocabulary at 4 families.** The grader uses all 6. Easy/Medium/Hard are guaranteed solvable using only families 1–4. Master puzzles may additionally require families 5–6; these are taught implicitly through hint text or in-game tutorialization at Master levels. This preserves the README's current commitment.
-- **Option B — Expand player vocabulary to 6 families.** Update the root README's Official Deduction Set. More upfront teaching; wider puzzle space at all difficulties.
-
-**Recommendation: Option A.** It preserves the simpler player-facing vocabulary and confines the extended deductions to the grader and the Master band.
+Family 5 is **not** part of the player-facing vocabulary. The hint system does not explain it. Master-tier players are expected to discover it through play. This keeps the taught vocabulary lean while allowing the grader to validate genuinely hard puzzles.
 
 ### Deduction ordering
 
@@ -160,11 +156,10 @@ When multiple deductions apply to the same candidate state, the solver must appl
 
 1. Housekeeping (after any new placement — eliminate same row, same column, same region, 3x3 no-touch neighborhood).
 2. Family 1 — Giveaway Cell.
-3. Family 2 — Region → Row/Column Confinement.
-4. Family 5 — Row/Column → Region Confinement.
-5. Family 3 — Touch-All Elimination.
-6. Family 6 — Higher-Order Confinement (K = 2, then K = 3).
-7. Family 4 — Contradiction / Blocking Elimination.
+3. Family 2 — Confinement. Try Region→Row/Column first, then Row/Column→Region. Either direction that fires counts as a single family-2 step in the trace.
+4. Family 3 — Touch-All Elimination.
+5. Family 4 — Contradiction / Blocking Elimination.
+6. Family 5 — Higher-Order Confinement (K = 2, then K = 3).
 
 If any step makes progress (places a token or eliminates a candidate), restart from step 1.
 
@@ -201,10 +196,10 @@ Classify the puzzle from the Stage 4 trace.
 
 | Band | Criteria |
 |---|---|
-| Easy | Solved using families 1 + housekeeping only. First placement within 0–2 elimination steps. |
-| Medium | Requires families 2 and/or 3. Chains of 3–6 eliminations between placements. |
+| Easy | Solved using family 1 + housekeeping only. First placement within 0–2 elimination steps. |
+| Medium | Requires family 2 and/or family 3. Chains of 3–6 eliminations between placements. |
 | Hard | Requires all of families 1–4. Chains of 7–12 eliminations. Multiple family-3 or family-4 steps. |
-| Master | Requires family 5 or family 6 at least once. Chains of 12+, tight candidate layouts, high first-placement depth. |
+| Master | Requires family 5 (Higher-Order Confinement) at least once. Chains of 12+, tight candidate layouts, high first-placement depth. |
 
 Thresholds are heuristic and should be **calibrated** against a small fixture set of hand-rated puzzles before the full 500-pack generation run.
 
