@@ -1,6 +1,6 @@
 # Archive — Original Design Documents
 
-This folder contains the original brainstorming, research, and early design documents that were used to develop the canonical project spec. They are preserved for historical reference.
+This folder contains the original brainstorming, research, and early design documents that were used to develop the canonical spec for **Skully Bones Treasure Adventure**. They are preserved for historical reference.
 
 **The authoritative specification is the root [README.md](../../README.md).** If anything in these archived documents contradicts the root README, the README takes precedence.
 

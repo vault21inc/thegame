@@ -1,6 +1,6 @@
-# Project Logic Grid
+# Skully Bones Treasure Adventure
 
-`Project Logic Grid` is the current working title for a mobile-first logic puzzle game based on 1-star Star Battle rules. The name is intentionally generic and should remain easy to replace later. The placed object should be called a `token` in code and design documentation, even if the current visual theme presents it as a queen.
+`Skully Bones Treasure Adventure` is a mobile-first logic puzzle game based on 1-star Star Battle rules. The placed object should be called a `token` in code and design documentation, even if the current visual theme presents it as a queen.
 
 The first development phase should focus on a polished local/offline mobile experience: a responsive puzzle board, smooth touch feedback, verified logic-only puzzles, local progress, stars, coins, and a minimum first content set of 500 levels.
 
@@ -427,29 +427,26 @@ Use Flutter built-in animations for most board feedback. Use Rive for reusable p
 
 ## Level Generation Strategy
 
-Puzzles are **pre-generated** using offline tooling and bundled with the app as verified level packs. The first phase target is at least 500 puzzles for an 8 x 8 grid.
+Puzzles are **pre-generated** using offline Dart CLI tooling and bundled with the app as verified JSON level packs. The first phase target is at least 500 puzzles for an 8 x 8 grid.
 
-Generator pipeline:
+The generator is a **generate-and-test pipeline with structured retry**. Candidates are produced cheaply, then filtered through progressively stricter validators. Most rejections occur at the uniqueness and logic-solvability stages.
 
-1. Generate a candidate 8 x 8 region layout.
-2. Generate or search for a valid solution.
-3. Verify the board has exactly one solution.
-4. Run the logic-solve validator using the four official deductions.
-5. Compute difficulty metrics.
-6. Reject boards that require unsupported reasoning.
-7. Export accepted puzzles into versioned JSON level packs.
+```text
+1. Generate Placement    →  Valid token arrangement
+2. Grow Regions          →  Partition into 8 connected regions
+3. Verify Uniqueness     →  Backtracking solver, early exit on 2nd solution
+4. Verify Logic-Solve    →  Deterministic deduction simulator
+5. Grade Difficulty      →  Classify Easy / Medium / Hard / Master
+6. Canonicalize + Dedup  →  Reject symmetric duplicates
+7. Enforce Band Quota    →  Target a controlled difficulty distribution
+8. Export + Order        →  Curate play order, write versioned JSON
+```
 
-Difficulty metadata per puzzle:
+The pipeline guarantees every shipped puzzle has a unique solution, is reachable through pure logic, carries a stable difficulty grade, and is distinct from every other puzzle in the pack. The 500-puzzle pack is ordered to ramp difficulty and introduce deduction families progressively.
 
-- Board size.
-- Number of deduction steps.
-- Maximum chain depth.
-- Deduction families required.
-- Candidate density.
-- First-forced-placement depth.
-- Estimated difficulty band.
+**The authoritative specification for the generator — including the deduction set used by the grader, retry budgets, canonicalization scheme, band quotas, and ordering strategy — is [docs/level-generation.md](docs/level-generation.md).**
 
-The generator algorithm, region generation approach, and performance targets are still to be determined.
+One product-level decision is flagged there and should be resolved before implementation: whether the player-facing deduction vocabulary stays at the 4 families in [Official Deduction Set](#official-deduction-set) (with the grader using additional families internally to validate Master-band puzzles) or expands to match the grader.
 
 ---
 
@@ -507,8 +504,6 @@ V1 should include:
 
 These decisions should be resolved before or during implementation:
 
-- Exact theme and final product name.
-- Generator algorithm and region generation approach.
 - Whether the first 500 levels are fully auto-generated or generated then manually curated.
 - Distribution of difficulty bands across the 500 levels.
 - Exact visual style for auto X marks vs player X marks.
