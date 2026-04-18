@@ -64,6 +64,17 @@ Since one-per-row and one-per-column are guaranteed by the permutation, the only
 
 Rows 2+ apart already satisfy Chebyshev distance ≥ 2 automatically.
 
+### Non-N-Queens guardrail
+
+This project is **not** classic N-Queens. Generator, solver, validator, hint, and test code must not use full chess-diagonal attack rules. Longer shared diagonals are legal as long as tokens are not adjacent.
+
+Required golden placement test:
+
+- σ = `[0, 2, 4, 6, 1, 3, 5, 7]` must be accepted by the placement validator.
+- This placement intentionally has tokens sharing a longer diagonal, including `(0,0)` and `(7,7)`.
+- It must pass because every adjacent row pair differs by at least 2 columns.
+- A classic N-Queens diagonal check would reject it; using that check here is a bug.
+
 **Method.** Randomized backtracking. For each row, shuffle the available columns and try each. Backtrack if no column satisfies the distance constraint.
 
 ## Stage 2 — Grow Regions
