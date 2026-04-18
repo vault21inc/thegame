@@ -504,18 +504,115 @@ V1 should include:
 
 ## Development Priorities
 
-Recommended first milestones:
+Recommended first milestones. Each milestone lists its **Done when** acceptance criteria; a milestone is not considered complete until every bullet under it holds.
 
-1. Build `puzzle_core` with board models, validator, and solution checker.
-2. Add fixtures for small known-valid 8 x 8 puzzles.
-3. Implement the four player-facing deduction families and the grader-only higher-order confinement extension for validation and difficulty grading.
-4. Build a CLI that verifies uniqueness and logic-solvability.
-5. Scaffold the Flutter app.
-6. Render a playable board with tap, X marks, double-tap, lives, and restart.
-7. Add local progress, stars (cumulative), and coins.
-8. Add animations and sound polish.
-9. Generate and verify the first level pack (500 puzzles).
-10. Wire linear level progression.
+### 1. Build `puzzle_core` with board models, validator, and solution checker.
+
+**Done when:**
+
+- `packages/puzzle_core` exists as a pure Dart package with no Flutter imports.
+- All core types from [docs/data-model.md](docs/data-model.md) §1 are implemented with the documented invariants enforced.
+- `PuzzleDefinition.fromJson` / `toJson` round-trip the schema in [docs/level-generation.md](docs/level-generation.md#puzzle-json-structure).
+- `PlacementValidator` and `SolutionValidator` are implemented per their contracts.
+- `dart analyze` reports zero warnings and zero info messages.
+- `dart test` passes with equality, invariant, and round-trip tests for every core type.
+
+### 2. Add fixtures for small known-valid 8 x 8 puzzles.
+
+**Done when:**
+
+- All synthetic deduction scenarios listed in [docs/test-fixtures.md](docs/test-fixtures.md) §1 exist in `packages/puzzle_core/test/deduction_scenarios/` and pass.
+- The three full-puzzle fixtures (easy / medium / hard) are present in `packages/puzzle_core/test/fixtures/` along with their `.trace.json` companions and a `fixtures/README.md` recording seed + generator version + selection criteria.
+- Every fixture passes all eight assertions in [docs/test-fixtures.md §2 — What the fixtures are tested against](docs/test-fixtures.md#what-the-fixtures-are-tested-against).
+- The coverage expectations in [docs/test-fixtures.md §3](docs/test-fixtures.md#coverage-expectations) are met.
+
+*Note:* Full-puzzle fixtures are produced by a one-time CLI bootstrap run (see [docs/test-fixtures.md §2 — How to produce the fixtures](docs/test-fixtures.md#how-to-produce-the-fixtures)), so this milestone depends on milestones 3 and 4 for the initial fixture generation. Synthetic deduction scenarios can (and should) be authored earlier.
+
+### 3. Implement the deduction families, logic solver, uniqueness solver, and difficulty grader.
+
+**Done when:**
+
+- Each of the five deduction families is implemented as a pure function with the signatures sketched in [docs/data-model.md §1 — Solver types](docs/data-model.md#solver-types).
+- The application order in [docs/level-generation.md §Deduction ordering](docs/level-generation.md#deduction-ordering) is enforced and protected by the ordering scenarios from [docs/test-fixtures.md §1](docs/test-fixtures.md#synthetic-deduction-family-scenarios).
+- `LogicSolver` loops families + housekeeping until solved or stuck, producing a deterministic `SolveResult` + trace.
+- `UniquenessSolver` counts solutions with early exit at 2 and the region row-set pruning from [docs/level-generation.md §Stage 3](docs/level-generation.md#stage-3--verify-unique-solution).
+- A `DifficultyGrader` classifies a `SolveResult` trace into a `Difficulty` band using the criteria in [docs/level-generation.md §Stage 5](docs/level-generation.md#stage-5--grade-difficulty).
+- Unit tests cover every family in isolation (positive and negative scenarios), plus end-to-end solver + grader runs against the three full-puzzle fixtures.
+- `dart analyze` clean; `dart test` passes.
+
+### 4. Build a CLI that generates, verifies, and exports level packs.
+
+**Done when:**
+
+- `tools/level_generator` produces a valid Dart CLI binary runnable via `dart run tools/level_generator`.
+- The 8-stage pipeline in [docs/level-generation.md](docs/level-generation.md) is implemented end-to-end, including retry topology, canonicalization + dedup, band quota enforcement, and ordering.
+- Flags `--seed`, `--count`, `--quota`, `--output`, `--over-fill`, `--max-candidates` are supported.
+- Output is a versioned JSON level pack plus a `LevelPackMetadata` file per [docs/data-model.md §3](docs/data-model.md#levelpackmetadata).
+- The CLI self-validates: every exported puzzle passes uniqueness + logic-solve + round-trip checks before it is written.
+- A given `--seed` produces a byte-identical pack across runs on the same generator version.
+
+### 5. Scaffold the Flutter app.
+
+**Done when:**
+
+- The repo scaffolding described in [docs/repo-scaffolding.md](docs/repo-scaffolding.md) is in place: Dart workspace `pubspec.yaml` at the root, package-level pubspecs, `analysis_options.yaml`, and `.gitignore`.
+- `apps/mobile` runs on both an iOS simulator and an Android emulator via `flutter run`, showing a placeholder home screen.
+- Riverpod, `go_router`, and Drift are configured with minimal wiring (empty provider scope, single `/` route, empty database).
+- A bundled level pack placeholder loads successfully at startup (no crash even if empty).
+- `flutter analyze` reports zero warnings.
+
+### 6. Render a playable board with tap, X marks, double-tap, lives, and restart.
+
+**Done when:**
+
+- The board renders region fills, region boundaries, and grid lines per [§Rendering and Interaction Strategy](#rendering-and-interaction-strategy).
+- All interactions defined in [§Player Interaction](#player-interaction) work: single tap toggles player X marks, double-tap validates against the hidden solution via `SolutionValidator`, correct placements run housekeeping, incorrect placements decrement lives.
+- Player X marks render as the treasure-map charcoal X style; auto marks render as the skull-and-crossbones style; the two are distinguishable without relying on color alone.
+- Auto-housekeeping marks cannot be removed by tap; player marks can.
+- Life counter is visible; reaching 0 shows a failure state requiring restart.
+- Restart fully resets tokens, marks, lives, and the undo stack.
+- Basic undo reverses the last X-mark action; it does not reverse token placements or life loss.
+- Placeholder fixtures (from milestone 2) are playable end-to-end.
+
+### 7. Add local progress, stars (cumulative), and coins.
+
+**Done when:**
+
+- Drift schema for `ProgressRecord` and `PlayerProfile` matches [docs/data-model.md §3](docs/data-model.md#3-persistence-types) with the documented invariants enforced via `CHECK` constraints and derivation logic.
+- `SessionOutcome` derivation applies the star + coin tables in [§Stars](#stars-cumulative-score) and [§Coins](#coins) exactly.
+- Total stars and total coins persist across app launches.
+- A restarted puzzle is scored as a fresh run; prior failed attempts do not affect the new run's stars.
+- `currentLevel` advances exactly on first successful completion.
+- Integration tests confirm persistence across simulated app restarts.
+
+### 8. Add animations and sound polish.
+
+**Done when:**
+
+- Every feedback interaction in [§Animation Direction](#animation-direction) is implemented.
+- Reduced-motion accessibility setting disables or attenuates all non-essential animation.
+- Sound and haptics respect their respective toggles in local settings.
+- Release-build performance on at least one physical Android and one physical iOS device meets the [§Performance Targets](#performance-targets) minimums.
+
+### 9. Generate and verify the first level pack (500 puzzles).
+
+**Done when:**
+
+- A pack of 500 verified puzzles is generated via the CLI from a recorded seed.
+- Band counts match the default quota in [docs/level-generation.md §Stage 7](docs/level-generation.md#stage-7--enforce-band-quota) (or a documented override).
+- Every puzzle in the pack passes uniqueness + logic-solve + JSON round-trip checks.
+- The pack's `LevelPackMetadata` is committed alongside the pack.
+- The app loads and plays a sample of 10+ puzzles across all bands without runtime errors.
+
+### 10. Wire linear level progression.
+
+**Done when:**
+
+- Level select shows the current level and, per [§Level Progression](#level-progression), gates access to future levels.
+- Completed levels display their best star rating.
+- Cumulative star total is visible on the home screen and updates after each successful completion.
+- The player cannot access a level beyond `currentLevel`.
+- Progress persists across app restarts (covered by milestone 7's integration tests).
 
 ---
 
