@@ -280,8 +280,9 @@ Run once at the end of the batch, after all quotas are met.
     "band": "medium",
     "steps": 14,
     "maxChainDepth": 5,
-    "families": [1, 2, 3],
-    "firstPlacementDepth": 3
+    "families": ["giveawayCell", "confinement", "touchAllElimination"],
+    "firstPlacementDepth": 3,
+    "minCandidateDensity": 0.42
   }
 }
 ```
