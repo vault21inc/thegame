@@ -1,0 +1,23 @@
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.g.dart.bak
+coverage/
+
+# Commit pubspec.lock for application packages (apps/mobile, tools/level_generator)
+# Ignore for library packages (packages/puzzle_core)
+packages/**/pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+
+# Generator staging output
+tools/level_generator/.staging/

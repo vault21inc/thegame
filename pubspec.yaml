@@ -1,0 +1,8 @@
+name: skully_bones_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+workspace:
+  - packages/puzzle_core
