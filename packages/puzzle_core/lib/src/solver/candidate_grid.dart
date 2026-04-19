@@ -10,12 +10,19 @@ import 'cell_state.dart';
 ///
 /// Concrete implementations land in milestone 3.
 abstract class CandidateGrid {
+  /// Square side length of the board represented by this grid.
   int get size;
 
+  /// Returns the current runtime state for [cell].
   CellState stateAt(Cell cell);
 
+  /// Returns remaining candidate cells in [row], ordered left-to-right.
   Set<Cell> candidatesInRow(int row);
+
+  /// Returns remaining candidate cells in [col], ordered top-to-bottom.
   Set<Cell> candidatesInColumn(int col);
+
+  /// Returns remaining candidate cells in the region with [regionId].
   Set<Cell> candidatesInRegion(int regionId);
 
   /// Marks [cell] as eliminated.
