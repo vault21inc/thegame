@@ -36,14 +36,17 @@ void main() {
 
     test('JSON structure matches the documented schema shape', () {
       final Map<String, Object?> json = buildQuadrantPuzzle().toJson();
-      expect(json.keys, containsAll(const <String>[
-        'id',
-        'version',
-        'size',
-        'regions',
-        'solution',
-        'difficulty',
-      ]));
+      expect(
+        json.keys,
+        containsAll(const <String>[
+          'id',
+          'version',
+          'size',
+          'regions',
+          'solution',
+          'difficulty',
+        ]),
+      );
       expect(json['id'], isA<String>());
       expect(json['version'], isA<int>());
       expect(json['size'], isA<int>());

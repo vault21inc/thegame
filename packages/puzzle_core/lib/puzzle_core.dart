@@ -11,15 +11,13 @@ export 'src/models/difficulty_metadata.dart';
 export 'src/models/puzzle_definition.dart';
 export 'src/models/puzzle_solution.dart';
 export 'src/models/region.dart';
-
-export 'src/validation/placement_validation_result.dart';
-export 'src/validation/placement_validator.dart';
-export 'src/validation/placement_violation.dart';
-export 'src/validation/solution_validator.dart';
-
 export 'src/solver/candidate_grid.dart';
 export 'src/solver/cell_state.dart';
 export 'src/solver/logic_solver.dart';
 export 'src/solver/solve_result.dart';
 export 'src/solver/trace_entry.dart';
 export 'src/solver/uniqueness_solver.dart';
+export 'src/validation/placement_validation_result.dart';
+export 'src/validation/placement_validator.dart';
+export 'src/validation/placement_violation.dart';
+export 'src/validation/solution_validator.dart';

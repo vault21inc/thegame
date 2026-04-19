@@ -63,19 +63,39 @@ PuzzleDefinition buildGoldenRowStripPuzzle() {
 PuzzleDefinition buildQuadrantPuzzle() {
   final Region r0 = Region(
     id: 0,
-    cells: const <Cell>{Cell(0, 0), Cell(0, 1), Cell(1, 0), Cell(1, 1)},
+    cells: <Cell>{
+      const Cell(0, 0),
+      const Cell(0, 1),
+      const Cell(1, 0),
+      const Cell(1, 1),
+    },
   );
   final Region r1 = Region(
     id: 1,
-    cells: const <Cell>{Cell(0, 2), Cell(0, 3), Cell(1, 2), Cell(1, 3)},
+    cells: <Cell>{
+      const Cell(0, 2),
+      const Cell(0, 3),
+      const Cell(1, 2),
+      const Cell(1, 3),
+    },
   );
   final Region r2 = Region(
     id: 2,
-    cells: const <Cell>{Cell(2, 0), Cell(2, 1), Cell(3, 0), Cell(3, 1)},
+    cells: <Cell>{
+      const Cell(2, 0),
+      const Cell(2, 1),
+      const Cell(3, 0),
+      const Cell(3, 1),
+    },
   );
   final Region r3 = Region(
     id: 3,
-    cells: const <Cell>{Cell(2, 2), Cell(2, 3), Cell(3, 2), Cell(3, 3)},
+    cells: <Cell>{
+      const Cell(2, 2),
+      const Cell(2, 3),
+      const Cell(3, 2),
+      const Cell(3, 3),
+    },
   );
 
   return PuzzleDefinition(

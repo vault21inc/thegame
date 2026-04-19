@@ -152,16 +152,16 @@ final class PuzzleDefinition {
     final Object? regionsValue = json['regions'];
 
     if (idValue is! String) {
-      throw FormatException('PuzzleDefinition.id must be a string');
+      throw const FormatException('PuzzleDefinition.id must be a string');
     }
     if (versionValue is! int) {
-      throw FormatException('PuzzleDefinition.version must be an int');
+      throw const FormatException('PuzzleDefinition.version must be an int');
     }
     if (sizeValue is! int) {
-      throw FormatException('PuzzleDefinition.size must be an int');
+      throw const FormatException('PuzzleDefinition.size must be an int');
     }
     if (regionsValue is! List<Object?>) {
-      throw FormatException('PuzzleDefinition.regions must be a list');
+      throw const FormatException('PuzzleDefinition.regions must be a list');
     }
 
     final List<Region> parsedRegions = regionsValue
@@ -193,7 +193,7 @@ final class PuzzleDefinition {
         final int? existing = map[cell];
         assert(
           existing == null,
-          'Cell $cell appears in multiple regions (${existing ?? 'n/a'} and ${region.id})',
+          'Cell $cell appears in multiple regions ($existing and ${region.id})',
         );
         map[cell] = region.id;
       }
