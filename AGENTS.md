@@ -4,6 +4,17 @@
 
 A mobile-first logic puzzle game based on **1-star Star Battle** rules, built with **Flutter + Dart**. Currently in pre-development (design docs only, no code yet).
 
+## Core Development Principles
+
+- **KISS** — Keep It Simple. Prefer the straightforward solution over the clever one.
+- **YAGNI** — Don't build it until you need it. No speculative features or abstractions.
+- **DRY** — Don't Repeat Yourself. Extract shared logic, but not at the cost of clarity.
+- **Readability first** — Code is read far more than it is written. Favor clear naming, small functions, and obvious control flow over terse or "smart" code.
+- **Single Responsibility** — Each class, function, and module should do one thing well.
+- **Composition over inheritance** — Prefer composing small, focused objects over deep class hierarchies.
+- **Fail fast** — Surface errors early at system boundaries; don't silently swallow or defer them.
+- **Minimal surface area** — Keep public APIs small. Expose only what consumers need.
+
 ## DO NOT
 
 - Commit or push changes to git.
