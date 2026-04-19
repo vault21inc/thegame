@@ -6,7 +6,7 @@ The first development phase should focus on a polished local/offline mobile expe
 
 ## Current Status
 
-This repository currently contains planning and design documents. No app scaffold has been created yet.
+**Live project status - including current phase, per-milestone progress, and known calibration TODOs - is tracked in [docs/status.md](docs/status.md). Update that file after each meaningful completion.**
 
 The `docs/archive/` folder contains the original brainstorming and research documents that informed this spec.
 
