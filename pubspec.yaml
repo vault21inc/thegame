@@ -6,3 +6,4 @@ environment:
 
 workspace:
   - packages/puzzle_core
+  - tools/level_generator
