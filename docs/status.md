@@ -6,19 +6,22 @@ Living document. Updated after each meaningful completion. For the authoritative
 
 ## Current phase
 
-**Milestone 3 (part A) complete — the deduction engine, concrete logic solver, uniqueness solver, and difficulty grader are implemented. Full fixture closeout is blocked until the generator bootstrap exists.**
+**Milestone 4 (part A) complete — `tools/level_generator` is scaffolded with a tested CLI contract and deterministic empty-pack export. Non-empty puzzle generation is the next generator slice.**
 
 What runs today:
 
 - `dart pub get` resolves the workspace cleanly.
 - `dart analyze --fatal-infos --fatal-warnings` reports **no issues**.
 - `dart test packages/puzzle_core` runs **132 tests, all passing**.
+- `dart test tools/level_generator` runs **10 tests, all passing**.
+- `dart run level_generator --help` prints the generator CLI usage.
+- `dart run level_generator -- --seed <n> --count 0 --output <path> --max-candidates 0` writes a deterministic empty pack shell.
 - `packages/puzzle_core` now includes concrete implementations for `StandardCandidateGrid`, the five pure deduction-family functions, `StandardLogicSolver`, `StandardUniquenessSolver`, and `DifficultyGrader`.
 - All 17 synthetic deduction scenarios now run against the real deduction engine, including ordering checks.
 
 What does not exist yet:
 
-- The `tools/level_generator` package. Milestone 4 creates it.
+- Non-empty generator stages: placement generation, region growth, uniqueness/logic filtering integration, canonicalization/dedup, quota enforcement, and curated ordering.
 - The `apps/mobile` Flutter app. Milestone 5 scaffolds it.
 - The bundled 500-puzzle level pack. Milestone 9 produces it.
 - The three full-puzzle fixtures and trace companions from Milestone 2 part B. These require the generator bootstrap so the fixtures can be honestly selected from verified Easy / Medium / Hard puzzles.
@@ -32,7 +35,7 @@ What does not exist yet:
 | 1 | Build `puzzle_core` with board models, validator, and solution checker | **Done** | All core types, validators, and abstract solver interfaces implemented and tested. Strict-casts, strict-inference, strict-raw-types compliant. |
 | 2 | Add fixtures for small known-valid 8 x 8 puzzles | **Part A done; part B blocked** | Part A: 17 synthetic deduction scenarios authored, structurally verified by integrity tests. Part B (three full-puzzle fixtures) requires milestones 3 and 4 to produce. |
 | 3 | Implement the deduction families, logic solver, uniqueness solver, and difficulty grader | **Part A done; fixture closeout blocked** | Concrete solver/grader code is implemented and synthetic scenarios pass. End-to-end fixture assertions wait for M4 to bootstrap verified full-puzzle fixtures. |
-| 4 | Build a CLI that generates, verifies, and exports level packs | **Not started; next up** | `tools/level_generator` package does not exist yet. Its bootstrap run will unblock full-puzzle fixtures. |
+| 4 | Build a CLI that generates, verifies, and exports level packs | **Part A done; generation pipeline pending** | `tools/level_generator` is a workspace package with CLI parsing, deterministic config/metadata, and empty-pack export. Non-empty Stage 1–8 generation is next. |
 | 5 | Scaffold the Flutter app | **Not started** | Can run in parallel with M3/M4 in principle; user is handling this personally. Docs at [docs/repo-scaffolding.md](repo-scaffolding.md). |
 | 6 | Render a playable board with tap, X marks, double-tap, lives, and restart | **Not started; blocked by M5** | |
 | 7 | Add local progress, stars (cumulative), and coins | **Not started; blocked by M5, M6** | |
@@ -46,7 +49,7 @@ What does not exist yet:
 
 - **Difficulty thresholds are heuristic:** `DifficultyGrader` implements the current Stage 5 rules, but Easy / Medium / Hard / Master thresholds should be calibrated once the first generated fixture set exists.
 - **Visual design for auto X marks (skull-and-crossbones) vs player X marks (charcoal-sketch X):** the concept is pinned in [README.md §X Marks](../README.md#x-marks), but there is no concrete asset spec yet. Assets in [assets/](../assets/) may serve as references during M6.
-- **Workspace membership:** only `packages/puzzle_core` is a workspace member so far. `apps/mobile` and `tools/level_generator` join the root `pubspec.yaml` `workspace:` list when their packages are scaffolded (M4 and M5).
+- **Workspace membership:** `packages/puzzle_core` and `tools/level_generator` are workspace members. `apps/mobile` joins the root `pubspec.yaml` `workspace:` list when it is scaffolded (M5).
 
 ---
 
@@ -54,6 +57,7 @@ What does not exist yet:
 
 Newest first. Date format: YYYY-MM-DD.
 
+- **2026-04-19** — Milestone 4 part A complete. Scaffolded `tools/level_generator` as a Dart workspace package with the required CLI flags (`--seed`, `--count`, `--quota`, `--output`, `--over-fill`, `--max-candidates`), strict config validation, default quota derivation, deterministic metadata JSON, and an honest empty-pack export path for scaffold smoke runs. Non-empty generation returns a pipeline-incomplete exit code until Stage 1–8 candidate generation lands. `dart analyze --fatal-infos --fatal-warnings` is clean; `dart test tools/level_generator` passes 10 tests; `dart test packages/puzzle_core` still passes 132 tests.
 - **2026-04-19** — Milestone 3 part A complete. Implemented concrete candidate-grid state, pure deduction functions for all five official families, deterministic logic solving with placement housekeeping traces, backtracking uniqueness counting with early exit at 2, and heuristic difficulty grading. Added runner tests for all 17 synthetic deduction scenarios, solver-loop coverage for stalled and non-giveaway states, grader threshold tests, and calibrated the previously-authored S5/O-family expectations against the real engine. `dart analyze --fatal-infos --fatal-warnings` is clean; `dart test packages/puzzle_core` passes 132 tests.
 - **2026-04-19** — Milestone 2 part A complete. Authored 17 synthetic deduction scenarios (8 required, 5 negative, 4 ordering) under `packages/puzzle_core/test/deduction_scenarios/` plus a structural-integrity test suite that runs without the deduction engine. 23 new tests pass (total now 97).
 - **2026-04-19** — Milestone 1 verified green. Fixed 95 analyze issues surfaced once Dart was installed: dropped retired `avoid_returning_null_for_future` lint, removed unused `dart:collection` import, consolidated barrel exports, added `const` to static `FormatException`s, added trailing commas, and converted `const <Cell>{...}` literals to `<Cell>{const Cell(...)}` (Cell overrides `==`, so it cannot be a const-set element). 74 tests pass.
