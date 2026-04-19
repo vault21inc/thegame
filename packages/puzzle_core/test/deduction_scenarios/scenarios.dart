@@ -153,58 +153,47 @@ final DeductionScenario s4Contradiction = DeductionScenario(
 // Family 5 — Higher-Order Confinement (grader-only)
 // ---------------------------------------------------------------------------
 
-/// K=2 rows case. After eliminations, R3 + R4 cover only rows 3-4. Other
-/// regions' cells in rows 3-4 must be eliminated.
+/// K=2 rows case. After eliminating R4's row-2 candidate, R3 + R4 cover
+/// only rows 3-4. Other regions' cells in rows 3-4 must be eliminated.
 ///
 /// Setup uses the 5x5 `mixed5x5` layout, modified via initial eliminations
-/// so that R3 and R4 are confined to rows 3-4 and R2's row 3-4 cells
-/// ((3,4)) become impossible.
+/// so that R3 and R4 are confined to rows 3-4 and R2's row 3 cell
+/// ((3,2)) becomes impossible.
 final DeductionScenario s5HigherOrderK2 = DeductionScenario(
   id: 'S5-higher-order-K2',
-  description: '5x5 mixed; R3 and R4 are both confined to rows 3-4 (their full '
-      'cell sets in this layout). Higher-order K=2 forces other regions '
-      'out of rows 3-4 — R2\'s (3,4) must be eliminated.',
+  description: '5x5 mixed; eliminate R4\'s (2,4) so R3 and R4 are both '
+      'confined to rows 3-4. Higher-order K=2 forces other regions '
+      'out of rows 3-4 — R2\'s (3,2) must be eliminated.',
   gridSize: 5,
   regions: mixed5x5(),
-  initialEliminations: const <Cell>{},
+  initialEliminations: <Cell>{const Cell(2, 4)},
   initialPlacements: const <Cell>{},
   expected: ExpectedElimination(
-    cells: <Cell>{const Cell(3, 4)},
+    cells: <Cell>{const Cell(3, 2)},
     family: DeductionFamily.higherOrderConfinement,
   ),
 );
 
-/// K=3 columns case. R0, R1, R2 together cover only columns 0-2 after
-/// eliminations, forcing R3 and R4 out of those columns.
+/// K=3 columns case. R0, R2, R3 together cover only columns 0-2 after
+/// eliminations, forcing other regions out of those columns.
 ///
-/// Uses `mixed5x5`. After eliminating R0's (0,1), (1,1), (2,1) cells that
-/// could place in col 1 — wait no, this requires careful setup. Per the
-/// scenario intent we simply specify initial eliminations that force K=3
-/// on the column axis; the concrete eliminations are chosen empirically.
-/// If milestone 3's runner disagrees with this setup, the expected
-/// outcome should be revised.
+/// Uses `mixed5x5`. Eliminating R2's (2,3) confines R0 + R2 + R3 to
+/// columns 0-2. That makes R1's (0,2) impossible because the three
+/// confined regions account for all tokens in those columns.
 final DeductionScenario s5HigherOrderK3 = DeductionScenario(
   id: 'S5-higher-order-K3',
   description:
-      '5x5 mixed; after eliminating (0,4), (1,4) (forcing R1 out of col 4) '
-      'and (2,4) (forcing R2 out of col 4), R0, R1, R2 together cover '
-      'only cols 0-3. Higher-order K=3 is intended to push other regions '
-      'out of cols 0-2. Exact expected elimination to be calibrated in '
-      'milestone 3.',
+      '5x5 mixed; eliminate R2\'s (2,3) so R0, R2, and R3 together '
+      'cover only cols 0-2. Higher-order K=3 pushes other regions out '
+      'of those columns.',
   gridSize: 5,
   regions: mixed5x5(),
   initialEliminations: <Cell>{
-    const Cell(0, 4),
-    const Cell(1, 4),
-    const Cell(2, 4),
+    const Cell(2, 3),
   },
   initialPlacements: const <Cell>{},
-  // Calibration note: the exact cells eliminated by K=3 depend on the
-  // surviving column footprint of R0, R1, R2 in this layout. The authored
-  // expectation below covers the structural intent — milestone 3's runner
-  // should confirm (or refine) the cell set.
   expected: ExpectedElimination(
-    cells: <Cell>{const Cell(3, 0), const Cell(4, 0)},
+    cells: <Cell>{const Cell(0, 2)},
     family: DeductionFamily.higherOrderConfinement,
   ),
 );
@@ -374,18 +363,16 @@ final DeductionScenario oFamily3Before4 = DeductionScenario(
 /// fire first.
 final DeductionScenario oFamily4Before5 = DeductionScenario(
   id: 'O-family-4-before-5',
-  description: '5x5 mixed; eliminate (2,0), (4,4) so that placing (1,0) would '
-      'empty R2 in the 3x3 neighborhood (Family 4) while R3+R4 remain '
-      'confined to rows 3-4 (Family 5 K=2). Family 4 must fire first.',
+  description: '5x5 mixed; eliminate (2,0), (4,4) so that placing (2,3) would '
+      'empty R4 through row/column/adjacency effects (Family 4) while '
+      'R3+R4 remain confined to rows 3-4 (Family 5 K=2). Family 4 must '
+      'fire first.',
   gridSize: 5,
   regions: mixed5x5(),
   initialEliminations: <Cell>{const Cell(2, 0), const Cell(4, 4)},
   initialPlacements: const <Cell>{},
-  // Exact Family 4 elimination cell depends on the precise trigger
-  // computed by milestone 3's engine. This expectation is the structural
-  // target; refine during milestone 3 if needed.
   expected: ExpectedElimination(
-    cells: <Cell>{const Cell(1, 0)},
+    cells: <Cell>{const Cell(2, 3)},
     family: DeductionFamily.contradictionElimination,
   ),
   mustNotFireFirst: const <DeductionFamily>{
