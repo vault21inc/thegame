@@ -6,24 +6,25 @@ Living document. Updated after each meaningful completion. For the authoritative
 
 ## Current phase
 
-**Milestone 4 part B Stage 2 complete — `tools/level_generator` now has deterministic solution placement and connected region growth. Uniqueness filtering is the next generator slice before non-empty puzzle export can begin.**
+**Milestone 4 part B Stage 3 complete — `tools/level_generator` now builds generated candidates and filters them for unique solutions. Logic-solvability filtering is the next generator slice before non-empty puzzle export can begin.**
 
 What runs today:
 
 - `dart pub get` resolves the workspace cleanly.
 - `dart analyze --fatal-infos --fatal-warnings` reports **no issues**.
 - `dart test packages/puzzle_core` runs **132 tests, all passing**.
-- `dart test tools/level_generator` runs **24 tests, all passing**.
+- `dart test tools/level_generator` runs **30 tests, all passing**.
 - `dart run level_generator --help` prints the generator CLI usage.
 - `dart run level_generator -- --seed <n> --count 0 --output <path> --max-candidates 0` writes a deterministic empty pack shell.
 - `SolutionPlacementGenerator` produces seeded, V1-valid solution placements with the non-N-Queens golden placement covered by generator tests.
 - `RegionGrowthGenerator` grows seeded, connected, size-bounded regions from valid placements and smoke-builds a `PuzzleDefinition`.
+- `PuzzleCandidateBuilder` composes generated placements and regions into temporary candidates, and `PuzzleUniquenessFilter` accepts only candidates with exactly one solution.
 - `packages/puzzle_core` now includes concrete implementations for `StandardCandidateGrid`, the five pure deduction-family functions, `StandardLogicSolver`, `StandardUniquenessSolver`, and `DifficultyGrader`.
 - All 17 synthetic deduction scenarios now run against the real deduction engine, including ordering checks.
 
 What does not exist yet:
 
-- Non-empty generator stages: uniqueness/logic filtering integration, canonicalization/dedup, quota enforcement, and curated ordering.
+- Non-empty generator stages: logic-solvability filtering integration, canonicalization/dedup, quota enforcement, and curated ordering.
 - The `apps/mobile` Flutter app. Milestone 5 scaffolds it.
 - The bundled 500-puzzle level pack. Milestone 9 produces it.
 - The three full-puzzle fixtures and trace companions from Milestone 2 part B. These require the generator bootstrap so the fixtures can be honestly selected from verified Easy / Medium / Hard puzzles.
@@ -37,7 +38,7 @@ What does not exist yet:
 | 1 | Build `puzzle_core` with board models, validator, and solution checker | **Done** | All core types, validators, and abstract solver interfaces implemented and tested. Strict-casts, strict-inference, strict-raw-types compliant. |
 | 2 | Add fixtures for small known-valid 8 x 8 puzzles | **Part A done; part B blocked** | Part A: 17 synthetic deduction scenarios authored, structurally verified by integrity tests. Part B (three full-puzzle fixtures) requires milestones 3 and 4 to produce. |
 | 3 | Implement the deduction families, logic solver, uniqueness solver, and difficulty grader | **Part A done; fixture closeout blocked** | Concrete solver/grader code is implemented and synthetic scenarios pass. End-to-end fixture assertions wait for M4 to bootstrap verified full-puzzle fixtures. |
-| 4 | Build a CLI that generates, verifies, and exports level packs | **Part B Stage 2 done; verification pipeline pending** | `tools/level_generator` has CLI parsing, deterministic config/metadata, empty-pack export, seeded Stage 1 placement generation, and Stage 2 connected region growth. Stage 3 uniqueness filtering is next. |
+| 4 | Build a CLI that generates, verifies, and exports level packs | **Part B Stage 3 done; logic pipeline pending** | `tools/level_generator` has CLI parsing, deterministic config/metadata, empty-pack export, seeded Stage 1 placement generation, Stage 2 connected region growth, and Stage 3 uniqueness filtering. Stage 4 logic-solvability filtering is next. |
 | 5 | Scaffold the Flutter app | **Not started** | Can run in parallel with M3/M4 in principle; user is handling this personally. Docs at [docs/repo-scaffolding.md](repo-scaffolding.md). |
 | 6 | Render a playable board with tap, X marks, double-tap, lives, and restart | **Not started; blocked by M5** | |
 | 7 | Add local progress, stars (cumulative), and coins | **Not started; blocked by M5, M6** | |
@@ -59,6 +60,7 @@ What does not exist yet:
 
 Newest first. Date format: YYYY-MM-DD.
 
+- **2026-04-19** — Milestone 4 part B Stage 3 complete. Added `PuzzleCandidateBuilder` to compose Stage 1 placements and Stage 2 regions into temporary candidates, plus `PuzzleUniquenessFilter` to delegate Stage 3 acceptance to `StandardUniquenessSolver`. Added coverage for structural generated candidates, deterministic replay, golden placement compatibility, invalid placement rejection, unique-puzzle acceptance, and multi-solution rejection. `dart test tools/level_generator` passes 30 tests.
 - **2026-04-19** — Milestone 4 part B Stage 2 complete. Added `RegionGrowthGenerator`, a seeded competitive flood-fill that grows eight connected regions from a valid placement, preserves exactly one solution token per region, and retries layouts outside the generated-content size bounds. Added coverage for deterministic growth, full-grid partitioning, contiguity, token ownership, golden placement input, invalid placement rejection, impossible quality bounds, and `PuzzleDefinition` smoke construction. `dart test tools/level_generator` passes 24 tests.
 - **2026-04-19** — Milestone 4 part B Stage 1 complete. Added a package-owned deterministic RNG and `SolutionPlacementGenerator` for seeded 8 x 8 token placements. The generator enforces one token per row/column plus adjacent no-touch only; long shared diagonals remain legal and are covered by a generator-side golden-placement test. `dart test tools/level_generator` passes 17 tests.
 - **2026-04-19** — Milestone 4 part A complete. Scaffolded `tools/level_generator` as a Dart workspace package with the required CLI flags (`--seed`, `--count`, `--quota`, `--output`, `--over-fill`, `--max-candidates`), strict config validation, default quota derivation, deterministic metadata JSON, and an honest empty-pack export path for scaffold smoke runs. Non-empty generation returns a pipeline-incomplete exit code until Stage 1–8 candidate generation lands. `dart analyze --fatal-infos --fatal-warnings` is clean; `dart test tools/level_generator` passes 10 tests; `dart test packages/puzzle_core` still passes 132 tests.
