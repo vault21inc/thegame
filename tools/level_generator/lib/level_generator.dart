@@ -10,3 +10,4 @@ export 'src/generator_config.dart';
 export 'src/level_generation_pipeline.dart';
 export 'src/level_pack.dart';
 export 'src/placement_generator.dart';
+export 'src/region_generator.dart';
