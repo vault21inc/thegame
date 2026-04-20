@@ -5,6 +5,7 @@
 /// pack generation.
 library;
 
+export 'src/candidate_generator.dart';
 export 'src/cli.dart';
 export 'src/generator_config.dart';
 export 'src/level_generation_pipeline.dart';
